@@ -11,21 +11,21 @@ def build_18_4_4_qldpc():
     Iy = np.roll(np.eye(m, dtype=np.uint8), py, axis=1)
     return np.kron(Ix, Iy)
 
-    # identity and x and y shifts bc bb code properties i think
-    I = shift_matrix(0, 0)
-    x = shift_matrix(1, 0)
-    y = shift_matrix(0, 1)
-    xy = shift_matrix(1, 1)
+   # identity and x and y shifts bc bb code properties i think
+  I = shift_matrix(0, 0)
+  x = shift_matrix(1, 0)
+  y = shift_matrix(0, 1)
+  xy = shift_matrix(1, 1)
 
-    # polynomials A = 1 + x + xy  mod 2
-    A = (I + x + xy) % 2
-    # B = 1 + y + xy (mod 2)
-    B = (I + y + xy) % 2
+  # polynomials A = 1 + x + xy  mod 2
+  A = (I + x + xy) % 2
+  # B = 1 + y + xy (mod 2)
+  B = (I + y + xy) % 2
 
-    # CSS parity-check matrices the hz dot hx = 0
-    Hx = np.hstack([A, B])
-    Hz = np.hstack([B.T, A.T])
+  # CSS parity-check matrices the hz dot hx = 0
+  Hx = np.hstack([A, B])
+  Hz = np.hstack([B.T, A.T])
 
-    return Hx, Hz
+  return Hx, Hz
 
 Hx, Hz = build_18_4_4_qldpc()
