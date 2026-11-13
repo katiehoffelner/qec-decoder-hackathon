@@ -88,3 +88,6 @@ true_observables = true_observables[:100] # match events no
 
 predictions = bp_decode(H, L, p, events, n=50) 
 print("logical error rate:", logical_error_rate(predictions, true_observables))
+# this gets us 0.1675
+#need x done too
+# we want to lower this value
