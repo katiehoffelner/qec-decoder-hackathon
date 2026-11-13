@@ -12,10 +12,10 @@ def build_18_4_4_qldpc():
     return np.kron(Ix, Iy)
 
    # identity and x and y shifts bc bb code properties i think
-  I = shift_matrix(0, 0)
-  x = shift_matrix(1, 0)
-  y = shift_matrix(0, 1)
-  xy = shift_matrix(1, 1)
+  I = shift(0, 0)
+  x = shift(1, 0)
+  y = shift(0, 1)
+  xy = shift(1, 1)
 
   # polynomials A = 1 + x + xy  mod 2
   A = (I + x + xy) % 2
