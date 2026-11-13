@@ -7,26 +7,6 @@ import pandas as pd
 df = pd.read_csv("data/train/train.csv")
 print(df.columns.tolist())
 
-#get z errors 
-df_z = df[df["basis"] == "Z"]
-
-#detector columns 
-det_cols = [f"D{i}" for i in range(70)]
-events = df_z[det_cols].values.astype(np.uint8)
-
-# true observable columns
-obs_cols = ["L0", "L1", "L2", "L3"]
-true_observables = df_z[obs_cols].values.astype(np.uint8)
-
-circuit = stim.Circuit.from_file("data/test/Z_circuit.stim")#
-# x stabilisers needed to correct for z error noise 
-info = problem_info(circuit)
-# 18, 4, 4
-# 5 rounds of error correction 
-H = info["H"]  # matrix shape
-L = info["L"]  # observables
-p = info["p"]  # prob vector shape
-
 def bp_decode(H, L, p, events, n=50):
 
     num_shots, num_checks = events.shape
@@ -82,12 +62,33 @@ def bp_decode(H, L, p, events, n=50):
     
     return predictions
 
+# Z-type errors 
+circuit_z = stim.Circuit.from_file("data/train/Z_circuit.stim")
+info_z = problem_info(circuit_z)
 
-events = events[:100] #number of shots tested - increase for better results but that slows it all down 
-true_observables = true_observables[:100] # match events no
+df_z = df[df["basis"] == "Z"]
+events_z = df_z[[f"D{i}" for i in range(70)]].values.astype(np.uint8)[:100]
+true_z = df_z[["L0","L1","L2","L3"]].values.astype(np.uint8)[:100]
 
-predictions = bp_decode(H, L, p, events, n=50) 
-print("logical error rate:", logical_error_rate(predictions, true_observables))
-# this gets us 0.1675
-#need x done too
-# we want to lower this value
+# no. shots for test and true comparison
+pred_z = bp_decode(info_z["H"], info_z["L"], info_z["p"], events_z, n=50)
+print("Z LER:", logical_error_rate(pred_z, true_z))
+# value was 0.1675
+
+# X- type errors
+circuit_x = stim.Circuit.from_file("data/train/X_circuit.stim")
+info_x = problem_info(circuit_x)
+
+# no. shots for test and true comparison
+df_x = df[df["basis"] == "X"]
+events_x = df_x[[f"D{i}" for i in range(70)]].values.astype(np.uint8)[:100]
+true_x = df_x[["L0","L1","L2","L3"]].values.astype(np.uint8)[:100]
+
+pred_x = bp_decode(info_x["H"], info_x["L"], info_x["p"], events_x, n=50)
+print("X-type error logical error rate:", logical_error_rate(pred_x, true_x))
+#value was 0.2125
+
+predictions = np.vstack([pred_z, pred_x])
+true_all = np.vstack([true_z, true_x])
+print("logical error rate(Z&X):", logical_error_rate(predictions, true_all))
+# value was 0.19
