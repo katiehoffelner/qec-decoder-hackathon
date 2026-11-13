@@ -5,7 +5,7 @@ from hackathon_2026 import logical_error_rate
 import pandas as pd
 
 df = pd.read_csv("data/train/train.csv")
-print(df.columns.tolist())
+# print(df.columns.tolist())
 
 def bp_decode(H, L, p, events, n=50):
 
